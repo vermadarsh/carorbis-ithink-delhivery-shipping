@@ -1,0 +1,58 @@
+.wcfmos-child-order {
+	background-color: #75FFDB !important;
+	display: block;
+	margin-top: 10px;
+	padding: 5px;
+}
+
+.wcfmos-parent-order {
+	background-color: #FFF0A3 !important;
+	display: block;
+	margin-top: 10px;
+	padding: 5px;
+}
+
+.wcfmos-parent-order span,
+.wcfmos-child-order span {
+	font-size: 12px;
+	color: black;
+}
+
+/* TOOLTIP */
+.tooltip {
+	position: relative;
+	display: inline-block;
+}
+
+.tooltip .tooltiptext {
+	visibility: hidden;
+	width: 120px;
+	background-color: #555;
+	color: #fff;
+	text-align: center;
+	padding: 5px 0;
+	border-radius: 6px;
+	position: absolute;
+	z-index: 1;
+	bottom: 125%;
+	left: 50%;
+	margin-left: -60px;
+	opacity: 0;
+	transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px;
+	border-style: solid;
+	border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+	visibility: visible;
+	opacity: 1;
+}
