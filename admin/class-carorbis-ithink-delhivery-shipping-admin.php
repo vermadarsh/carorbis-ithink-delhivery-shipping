@@ -148,7 +148,8 @@ class Carorbis_Ithink_Delhivery_Shipping_Admin {
 	 * @since 1.0.0
 	 */
 	public function cids_woocommerce_get_sections_shipping_callback( $sections ) {
-		$sections['ithink_logistics'] = __( 'iThink Logistics', 'carorbis-ithink-delhivery-shipping' );
+		$sections['ithink_logistics']    = __( 'iThink Logistics', 'carorbis-ithink-delhivery-shipping' );
+		$sections['delhivery_logistics'] = __( 'Delhivery Logistics', 'carorbis-ithink-delhivery-shipping' );
 
 		return $sections;
 	}
@@ -161,54 +162,114 @@ class Carorbis_Ithink_Delhivery_Shipping_Admin {
 	 * @since 1.0.0
 	 */
 	public function cids_woocommerce_get_settings_shipping_callback( $settings, $section ) {
-		// Return the settings if the current section is not ithink logistics.
-		if ( 'ithink_logistics' !== $section ) {
-			return $settings;
+		// Create the settings only when the current section is ithink logistics.
+		if ( 'ithink_logistics' === $section ) {
+			// Blank the settings array.
+			$settings = array();
+
+			// Add title to the settings.
+			$settings[] = array(
+				'type' => 'title',
+				'name' => __( 'iThink Logistics Settings', 'carorbis-ithink-delhivery-shipping' ),
+				'desc' => __( 'Following options are used to configure the iThink logistics API integration with the orders.', 'carorbis-ithink-delhivery-shipping' ),
+				'id'   => 'ithink-logistics'
+			);
+
+			// Add access token to the settings.
+			$settings[] = array(
+				'type'     => 'text',
+				'name'     => __( 'Access Token', 'carorbis-ithink-delhivery-shipping' ),
+				'desc'     => __( 'iThink logistics access token.', 'carorbis-ithink-delhivery-shipping' ),
+				'desc_tip' => true,
+				'id'       => 'ithink_logistics_access_token',
+			);
+
+			// Add secret key to the settings.
+			$settings[] = array(
+				'type'     => 'text',
+				'name'     => __( 'Secret Key', 'carorbis-ithink-delhivery-shipping' ),
+				'desc'     => __( 'iThink logistics secret key.', 'carorbis-ithink-delhivery-shipping' ),
+				'desc_tip' => true,
+				'id'       => 'ithink_logistics_secret_key',
+			);
+
+			// Add staging access token to the settings.
+			$settings[] = array(
+				'type'     => 'text',
+				'name'     => __( 'Access Token - Staging', 'carorbis-ithink-delhivery-shipping' ),
+				'desc'     => __( 'iThink logistics access token for sandbox purpose.', 'carorbis-ithink-delhivery-shipping' ),
+				'desc_tip' => true,
+				'id'       => 'ithink_logistics_access_token_staging',
+			);
+
+			// Add staging secret key to the settings.
+			$settings[] = array(
+				'type'     => 'text',
+				'name'     => __( 'Secret Key - Staging', 'carorbis-ithink-delhivery-shipping' ),
+				'desc'     => __( 'iThink logistics secret key for sandbox purpose.', 'carorbis-ithink-delhivery-shipping' ),
+				'desc_tip' => true,
+				'id'       => 'ithink_logistics_secret_key_staging',
+			);
+
+			// Add staging pickup address ID to the settings.
+			$settings[] = array(
+				'type'     => 'number',
+				'name'     => __( 'Warehouse Pickup Address ID - Staging', 'carorbis-ithink-delhivery-shipping' ),
+				'desc'     => __( 'iThink logistics warehouse pickup address ID for sandbox purpose.', 'carorbis-ithink-delhivery-shipping' ),
+				'desc_tip' => true,
+				'id'       => 'ithink_logistics_warehouse_pickup_address_id_staging',
+			);
+
+			// Add sandbox mode to the settings.
+			$settings[] = array(
+				'type'     => 'checkbox',
+				'name'     => __( 'Sandbox Mode?', 'carorbis-ithink-delhivery-shipping' ),
+				'desc'     => __( 'Check this box to enable the sandbox mode. When enabled, all the API requests will goto "https://pre-alpha.ithinklogistics.com/api_v3/" which will otherwise goto "https://manage.ithinklogistics.com/api_v3/".', 'carorbis-ithink-delhivery-shipping' ),
+				'desc_tip' => false,
+				'id'       => 'ithink_logistics_sandbox_mode',
+			);
+
+			// End the settings.
+			$settings[] = array(
+				'type' => 'sectionend',
+				'id'   => 'ithink-logistics',
+			);
+		} elseif ( 'delhivery_logistics' === $section ) { // Create the settings only when the current section is delhivery logistics.
+			// Blank the settings array.
+			$settings = array();
+
+			// Add title to the settings.
+			$settings[] = array(
+				'type' => 'title',
+				'name' => __( 'Delhivery Logistics Settings', 'carorbis-ithink-delhivery-shipping' ),
+				'desc' => __( 'Following options are used to configure the delhivery logistics API integration with the orders.', 'carorbis-ithink-delhivery-shipping' ),
+				'id'   => 'delhivery-logistics'
+			);
+
+			// Add access token to the settings.
+			$settings[] = array(
+				'type'     => 'text',
+				'name'     => __( 'Access Token', 'carorbis-ithink-delhivery-shipping' ),
+				'desc'     => __( 'Delhivery logistics access token.', 'carorbis-ithink-delhivery-shipping' ),
+				'desc_tip' => true,
+				'id'       => 'delhivery_logistics_access_token',
+			);
+
+			// Add sandbox mode to the settings.
+			$settings[] = array(
+				'type'     => 'checkbox',
+				'name'     => __( 'Sandbox Mode?', 'carorbis-ithink-delhivery-shipping' ),
+				'desc'     => __( 'Check this box to enable the sandbox mode.', 'carorbis-ithink-delhivery-shipping' ),
+				'desc_tip' => false,
+				'id'       => 'delhivery_logistics_sandbox_mode',
+			);
+
+			// End the settings.
+			$settings[] = array(
+				'type' => 'sectionend',
+				'id'   => 'delhivery-logistics',
+			);
 		}
-
-		// Blank the settings array.
-		$settings = array();
-
-		// Add title to the settings.
-		$settings[] = array(
-			'type' => 'title',
-			'name' => __( 'iThink Logistics Settings', 'carorbis-ithink-delhivery-shipping' ),
-			'desc' => __( 'Following options are used to configure the iThink logistics API integration with the orders.', 'carorbis-ithink-delhivery-shipping' ),
-			'id'   => 'ithink-logistics'
-		);
-
-		// Add access token to the settings.
-		$settings[] = array(
-			'type'     => 'text',
-			'name'     => __( 'Access Token', 'carorbis-ithink-delhivery-shipping' ),
-			'desc'     => __( 'iThink logistics access token.', 'carorbis-ithink-delhivery-shipping' ),
-			'desc_tip' => true,
-			'id'       => 'ithink_logistics_access_token',
-		);
-
-		// Add secret key to the settings.
-		$settings[] = array(
-			'type'     => 'text',
-			'name'     => __( 'Secret Key', 'carorbis-ithink-delhivery-shipping' ),
-			'desc'     => __( 'iThink logistics secret key.', 'carorbis-ithink-delhivery-shipping' ),
-			'desc_tip' => true,
-			'id'       => 'ithink_logistics_secret_key',
-		);
-
-		// Add sandbox mode to the settings.
-		$settings[] = array(
-			'type'     => 'checkbox',
-			'name'     => __( 'Sandbox Mode?', 'carorbis-ithink-delhivery-shipping' ),
-			'desc'     => __( 'Check this box to enable the sandbox mode. When enabled, all the API requests will goto "https://pre-alpha.ithinklogistics.com/api_v3/" which will otherwise goto "https://manage.ithinklogistics.com/api_v3/".', 'carorbis-ithink-delhivery-shipping' ),
-			'desc_tip' => false,
-			'id'       => 'ithink_logistics_sandbox_mode',
-		);
-
-		// End the settings.
-		$settings[] = array(
-			'type' => 'sectionend',
-			'id'   => 'ithink-logistics',
-		);
 
 		return $settings;
 	}

@@ -161,10 +161,12 @@ class Carorbis_Ithink_Delhivery_Shipping {
 		$this->loader->add_action( 'woocommerce_thankyou', $plugin_public, 'cids_woocommerce_thankyou_callback' );
 		$this->loader->add_filter( 'woocommerce_my_account_my_orders_query', $plugin_public, 'cids_woocommerce_my_account_my_orders_query_callback', 99 );
 		$this->loader->add_filter( 'wcfmmp_order_label_display', $plugin_public, 'cids_wcfmmp_order_label_display_callback', 20, 2 );
-		$this->loader->add_action( 'wcfm_vendor_settings_update', $plugin_public, 'cids_wcfm_vendor_settings_update_callback', 20, 2 );
+		// $this->loader->add_action( 'wcfm_vendor_settings_update', $plugin_public, 'cids_wcfm_vendor_settings_update_callback', 20, 2 );
+		$this->loader->add_action( 'wcfm_profile_update', $plugin_public, 'cids_wcfm_profile_update_callback', 20, 2 );
 		$this->loader->add_action( 'user_register', $plugin_public, 'cids_user_register_callback' );
 		$this->loader->add_filter( 'woocommerce_shipping_methods', $plugin_public, 'cids_woocommerce_shipping_methods_callback' );
 		$this->loader->add_action( 'woocommerce_shipping_init', $plugin_public, 'cids_woocommerce_shipping_init_callback' );
+		$this->loader->add_action( 'wp', $plugin_public, 'cids_wp_callback' );
 	}
 
 	/**

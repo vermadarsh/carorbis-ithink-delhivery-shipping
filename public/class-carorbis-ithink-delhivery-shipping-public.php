@@ -55,7 +55,7 @@ class Carorbis_Ithink_Delhivery_Shipping_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function cids_wp_enqueue_scripts_callback() {
 		// Custom public style.
 		wp_enqueue_style(
 			$this->plugin_name,
@@ -126,17 +126,8 @@ class Carorbis_Ithink_Delhivery_Shipping_Public {
 		// Make the array unique.
 		$wcfm_vendors = array_unique( $wcfm_vendors );
 
-		/**
-		 * If there is only one vendor, no need to split.
-		 * Before returning, push the order to delhivery system.
-		 */
+		// If there is only one vendor, no need to split.
 		if ( 1 === count( $wcfm_vendors ) ) {
-			/**
-			 * Push the order to delhivery system now.
-			 *
-			 * @param array $order_id WooCommerce order ID.
-			 */
-			do_action( 'delhivery_push_order', array( $order_id ) );
 			return;
 		}
 
@@ -373,34 +364,18 @@ class Carorbis_Ithink_Delhivery_Shipping_Public {
 	 * @since 1.0.0
 	 */
 	public function cids_wcfm_vendor_settings_update_callback( $user_id, $user_data ) {
-		global $wpdb;
-		$user_info = get_userdata($user_id);
-		$data = array(
-			'name' => $user_info->user_login,
-			'registered_name' => $user_info->user_login,
-			'address' => $user_data['address']['street_1'] . ' ' . $user_data['address']['street_2'] . ' ' . $user_data['address']['city'],
-			'pin' => $user_data['address']['zip'],
-			'phone' => $user_data['phone'],
-		);
+		cids_update_vendor_profile_details_on_delhivery( $user_id, $wcfm_profile_form );
+		cids_update_vendor_profile_details_on_ithink( $user_id, $wcfm_profile_form );
+	}
 
-		$accesstoken = 'Token ef1757c20c08cc418d0adac5b3e1be35cad6435c';
-		$url = "https://track.delhivery.com/api/backend/clientwarehouse/edit/";
-		$data_json = json_encode($data);
-		$header = array();
-		$header[] = 'Content-type: application/json';
-		$header[] = 'Accept: application/json';
-		$header[] = 'Authorization:' . $accesstoken;
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$response  = curl_exec($ch);
-		$output = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $response), true);
-		$create_res_vlaue = json_encode($output);
+	/**
+	 * Update the vendor profile details on delhivery.
+	 *
+	 * @since 1.0.0
+	 */
+	public function cids_wcfm_profile_update_callback( $user_id, $wcfm_profile_form ) {
+		// cids_update_vendor_profile_details_on_delhivery( $user_id, $wcfm_profile_form );
+		cids_update_vendor_profile_details_on_ithink( $user_id, $wcfm_profile_form );
 	}
 
 	/**
@@ -427,8 +402,8 @@ class Carorbis_Ithink_Delhivery_Shipping_Public {
 				'return_city' => $_POST['wcfmvm_static_infos']['address']['city'],
 				'return_state' => $_POST['wcfmvm_static_infos']['address']['state']
 			);
-	
-			$accesstoken = 'Token ef1757c20c08cc418d0adac5b3e1be35cad6435c';
+
+			$accesstoken = get_option( 'delhivery_logistics_access_token' );
 			$url = "https://track.delhivery.com/api/backend/clientwarehouse/create/";
 			$data_json = json_encode($data);
 			$header = array();
@@ -474,5 +449,13 @@ class Carorbis_Ithink_Delhivery_Shipping_Public {
 
 		// Include the delhivery class file.
 		include CIDS_PLUGIN_PATH . 'includes/shipping/delhivery/class-delhivery-express-shipping-method.php';
+	}
+
+	/**
+	 * Do something on wp load.
+	 *
+	 * @since 1.0.0
+	 */
+	public function cids_wp_callback() {
 	}
 }

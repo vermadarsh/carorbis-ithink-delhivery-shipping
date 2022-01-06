@@ -307,3 +307,318 @@ if ( ! function_exists( 'cids_manifest_order_to_delhivery' ) ) {
 		}
 	}
 }
+
+/**
+ * Check if this function is not defined.
+ */
+if ( ! function_exists( 'cids_update_vendor_profile_details_on_delhivery' ) ) {
+	/**
+	 * Update vendor profile details on delhivery.
+	 *
+	 * @param int   $user_id User ID.
+	 * @param array $wcfm_profile_form Profile form data.
+	 * @since 1.0.0
+	 */
+	function cids_update_vendor_profile_details_on_delhivery( $user_id, $wcfm_profile_form ) {
+		global $wpdb;
+		$store_address_1  = get_user_meta( $user_id, '_wcfm_street_1', true );
+		$store_address_2  = get_user_meta( $user_id, '_wcfm_street_2', true );
+		$store_city       = get_user_meta( $user_id, '_wcfm_city', true );
+		$store_postcode   = get_user_meta( $user_id, '_wcfm_zip', true );
+		$store_country    = get_user_meta( $user_id, '_wcfm_country', true );
+		$store_state      = get_user_meta( $user_id, '_wcfm_state', true );
+		$first_name       = ( ! empty( $wcfm_profile_form['first_name'] ) ) ? $wcfm_profile_form['first_name'] : ( ! empty( $wcfm_profile_form['bfirst_name'] ) ? $wcfm_profile_form['bfirst_name'] : '' );
+		$first_name       = ( empty( $first_name ) ) ? get_user_meta( $user_id, 'first_name', true ) : $first_name;
+		$last_name        = ( ! empty( $wcfm_profile_form['last_name'] ) ) ? $wcfm_profile_form['last_name'] : ( ! empty( $wcfm_profile_form['blast_name'] ) ? $wcfm_profile_form['blast_name'] : '' );
+		$last_name        = ( empty( $last_name ) ) ? get_user_meta( $user_id, 'last_name', true ) : $last_name;
+		$vendor_name      = "{$first_name} {$last_name}";
+		$profile_settings = get_user_meta( $user_id, 'wcfmmp_profile_settings', true );
+		$vendor_phone     = ( ! empty( $profile_settings['phone'] ) ) ? $profile_settings['phone'] : ( ( ! empty( $wcfm_profile_form['phone'] ) ) ? $wcfm_profile_form['phone'] : '' );
+		$username         = $wpdb->get_results( "SELECT `user_login` FROM $wpdb->users WHERE `ID` = {$user_id}", ARRAY_A );
+		$username         = ( ! empty( $username[0]['user_login'] ) ) ? $username[0]['user_login'] : '';
+		$sandbox_mode     = get_option( 'delhivery_logistics_sandbox_mode' );
+		$api_url          = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? 'https://staging-express.delhivery.com/api/backend/clientwarehouse/edit/' : 'https://track.delhivery.com/api/backend/clientwarehouse/edit/';
+		$access_token     = get_option( 'delhivery_logistics_access_token' );
+
+		// Return, if the username is unavailable.
+		if ( empty( $username ) ) {
+			return;
+		}
+
+		// Return, if the access token is unavailable.
+		if ( empty( $access_token ) ) {
+			return;
+		}
+
+		echo wp_json_encode(
+			array(
+				'name'            => $vendor_name,
+				'registered_name' => $username,
+				'address'         => "{$store_address_1}, {$store_address_2}, {$store_city}",
+				'pin'             => $store_postcode,
+				'phone'           => $vendor_phone,
+			)
+		); die;
+
+		var_dump( $access_token );
+
+		// Fire the API now.
+		$response = wp_remote_post(
+			$api_url,
+			array(
+				'method'  => 'POST',
+				'timeout' => '600',
+				'body'    => wp_json_encode(
+					array(
+						'name'            => $vendor_name,
+						'registered_name' => $username,
+						'address'         => "{$store_address_1}, {$store_address_2}, {$store_city}",
+						'pin'             => $store_postcode,
+						'phone'           => $vendor_phone,
+					)
+				),
+				'headers' => array(
+					'Authorization' => $access_token,
+					'Content-type'  => 'application/json',
+					'Accept'        => 'application/json',
+				),
+			)
+		);
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		$response_body = wp_remote_retrieve_body( $response );
+		debug( $response_code );
+		debug( $response_body );
+		die;
+	}
+}
+
+/**
+ * Check if this function is not defined.
+ */
+if ( ! function_exists( 'cids_update_vendor_profile_details_on_ithink' ) ) {
+	/**
+	 * Update vendor profile details on ithink.
+	 *
+	 * @param int   $user_id User ID.
+	 * @param array $wcfm_profile_form Profile form data.
+	 * @since 1.0.0
+	 */
+	function cids_update_vendor_profile_details_on_ithink( $user_id, $wcfm_profile_form ) {
+		global $wpdb;
+		$store_address_1  = get_user_meta( $user_id, '_wcfm_street_1', true );
+		$store_address_2  = get_user_meta( $user_id, '_wcfm_street_2', true );
+		$store_city       = get_user_meta( $user_id, '_wcfm_city', true );
+		$store_postcode   = get_user_meta( $user_id, '_wcfm_zip', true );
+		$store_country    = get_user_meta( $user_id, '_wcfm_country', true );
+		$store_state      = get_user_meta( $user_id, '_wcfm_state', true );
+		$first_name       = ( ! empty( $wcfm_profile_form['first_name'] ) ) ? $wcfm_profile_form['first_name'] : ( ! empty( $wcfm_profile_form['bfirst_name'] ) ? $wcfm_profile_form['bfirst_name'] : '' );
+		$first_name       = ( empty( $first_name ) ) ? get_user_meta( $user_id, 'first_name', true ) : $first_name;
+		$last_name        = ( ! empty( $wcfm_profile_form['last_name'] ) ) ? $wcfm_profile_form['last_name'] : ( ! empty( $wcfm_profile_form['blast_name'] ) ? $wcfm_profile_form['blast_name'] : '' );
+		$last_name        = ( empty( $last_name ) ) ? get_user_meta( $user_id, 'last_name', true ) : $last_name;
+		$vendor_name      = "{$first_name} {$last_name}";
+		$profile_settings = get_user_meta( $user_id, 'wcfmmp_profile_settings', true );
+		$vendor_phone     = ( ! empty( $profile_settings['phone'] ) ) ? $profile_settings['phone'] : ( ( ! empty( $wcfm_profile_form['phone'] ) ) ? $wcfm_profile_form['phone'] : '' );
+		$username         = $wpdb->get_results( "SELECT `user_login` FROM $wpdb->users WHERE `ID` = {$user_id}", ARRAY_A );
+		$username         = ( ! empty( $username[0]['user_login'] ) ) ? $username[0]['user_login'] : '';
+		$sandbox_mode     = get_option( 'ithink_logistics_sandbox_mode' );
+		$api_url          = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? 'https://pre-alpha.ithinklogistics.com/api_v3/warehouse/add.json' : 'https://manage.ithinklogistics.com/api_v3/warehouse/add.json';
+		$access_token     = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? get_option( 'ithink_logistics_access_token_staging' ) : get_option( 'ithink_logistics_access_token' );
+		$secret_key       = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? get_option( 'ithink_logistics_secret_key_staging' ) : get_option( 'ithink_logistics_secret_key' );
+		$vendor_state_id  = cids_get_vendor_state_id( $store_state );
+		$vendor_city_id   = cids_get_vendor_city_id( $store_city, $vendor_state_id );
+
+		// Return, if the username is unavailable.
+		if ( empty( $username ) ) {
+			return;
+		}
+
+		// Return, if the access token is unavailable.
+		if ( empty( $access_token ) ) {
+			return;
+		}
+
+		// Return, if the secret key is unavailable.
+		if ( empty( $secret_key ) ) {
+			return;
+		}
+
+		// Fire the API now.
+		$response = wp_remote_post(
+			$api_url,
+			array(
+				'method'  => 'POST',
+				'timeout' => '600',
+				'body'    => wp_json_encode(
+					array(
+						'data' => array(
+							'company_name' => $vendor_name,
+							'address1'     => $store_address_1,
+							'address2'     => $store_address_2,
+							'mobile'       => $vendor_phone,
+							'pincode'      => $store_postcode,
+							'city_id'      => $vendor_city_id,
+							'state_id'     => $vendor_state_id,
+							'country_id'   => '101',
+							'access_token' => $access_token,
+							'secret_key'   => $secret_key,
+						),
+					)
+				),
+				'headers' => array(
+					'cache-control' => 'no-cache',
+					'content-type'  => 'application/json',
+				),
+			)
+		);
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		$response_body = wp_remote_retrieve_body( $response );
+		debug( $response_code );
+		debug( $response_body );
+		debug( json_decode( $response_body, true ) );
+		die;
+	}
+}
+
+/**
+ * Check if this function is not defined.
+ */
+if ( ! function_exists( 'cids_get_vendor_state_id' ) ) {
+	/**
+	 * Get the state ID for the vendor state.
+	 *
+	 * @param string $store_state Vendor state code.
+	 * @return int|boolean
+	 * @since 1.0.0
+	 */
+	function cids_get_vendor_state_id( $store_state ) {
+		$wc_countries      = new WC_Countries();
+		$wc_states         = $wc_countries->get_states( 'IN' );
+		$vendor_state_full = ( ! empty( $wc_states[ $store_state ] ) ) ? $wc_states[ $store_state ] : '';
+
+		// Return false, if there is no state.
+		if ( empty( $vendor_state_full ) ) {
+			return false;
+		}
+
+		// Get the state ID from state's full name.
+		$sandbox_mode = get_option( 'ithink_logistics_sandbox_mode' );
+		$api_url      = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? 'https://pre-alpha.ithinklogistics.com/api_v3/state/get.json' : 'https://manage.ithinklogistics.com/api_v3/state/get.json';
+		$access_token = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? get_option( 'ithink_logistics_access_token_staging' ) : get_option( 'ithink_logistics_access_token' );
+		$secret_key   = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? get_option( 'ithink_logistics_secret_key_staging' ) : get_option( 'ithink_logistics_secret_key' );
+		$api_params   = array(
+			'data' => array(
+				'country_id'   => '101',
+				'access_token' => $access_token,
+				'secret_key'   => $secret_key,
+			),
+		);
+
+		// Fire the API now.
+		$response = wp_remote_post(
+			$api_url,
+			array(
+				'body'    => wp_json_encode( $api_params ),
+				'headers' => array(
+					'cache-control' => 'no-cache',
+					'content-type'  => 'application/json',
+				),
+			)
+		);
+
+		// Get the API response code.
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		// Return false, if there is an invalid API response.
+		if ( 200 !== $response_code ) {
+			return false;
+		}
+
+		$response_body = json_decode( wp_remote_retrieve_body( $response ), true );
+		$state_ids     = ( ! empty( $response_body['data'] ) ) ? $response_body['data'] : false;
+
+		// Return false, if the state IDs are not available.
+		if ( false  === $state_ids ) {
+			return false;
+		}
+
+		$state_names_arr   = array_column( $state_ids, 'state_name' );
+		$store_state_index = ( ! empty( $state_names_arr ) && is_array( $state_names_arr ) ) ? array_search( $vendor_state_full, $state_names_arr, true ) : false;
+
+		// Return false, if the vendor state index is unavailable.
+		if ( false === $store_state_index ) {
+			return false;
+		}
+
+		// Return the vendor state ID.
+		return ( ! empty( $state_ids[ $store_state_index ]['id'] ) ) ? $state_ids[ $store_state_index ]['id'] : false;
+	}
+}
+
+/**
+ * Check if this function is not defined.
+ */
+if ( ! function_exists( 'cids_get_vendor_city_id' ) ) {
+	/**
+	 * Get the city ID for the vendor city name and state ID.
+	 *
+	 * @param string $city_full_name Vendor city full name.
+	 * @param int    $vendor_state_ithink_id Vendor state ithink ID.
+	 * @return int|boolean
+	 * @since 1.0.0
+	 */
+	function cids_get_vendor_city_id( $city_full_name, $vendor_state_ithink_id ) {
+		// Get the state ID from state's full name.
+		$sandbox_mode = get_option( 'ithink_logistics_sandbox_mode' );
+		$api_url      = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? 'https://pre-alpha.ithinklogistics.com/api_v3/city/get.json' : 'https://manage.ithinklogistics.com/api_v3/city/get.json';
+		$access_token = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? get_option( 'ithink_logistics_access_token_staging' ) : get_option( 'ithink_logistics_access_token' );
+		$secret_key   = ( ! empty( $sandbox_mode ) && 'yes' === $sandbox_mode ) ? get_option( 'ithink_logistics_secret_key_staging' ) : get_option( 'ithink_logistics_secret_key' );
+		$api_params   = array(
+			'data' => array(
+				'state_id'     => $vendor_state_ithink_id,
+				'access_token' => $access_token,
+				'secret_key'   => $secret_key,
+			),
+		);
+
+		// Fire the API now.
+		$response = wp_remote_post(
+			$api_url,
+			array(
+				'body'    => wp_json_encode( $api_params ),
+				'headers' => array(
+					'cache-control' => 'no-cache',
+					'content-type'  => 'application/json',
+				),
+			)
+		);
+
+		// Get the API response code.
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		// Return false, if there is an invalid API response.
+		if ( 200 !== $response_code ) {
+			return false;
+		}
+
+		$response_body = json_decode( wp_remote_retrieve_body( $response ), true );
+		$city_ids      = ( ! empty( $response_body['data'] ) ) ? $response_body['data'] : false;
+
+		// Return false, if the city IDs are not available.
+		if ( false  === $city_ids ) {
+			return false;
+		}
+
+		$city_names_arr   = array_column( $city_ids, 'city_name' );
+		$store_city_index = ( ! empty( $city_names_arr ) && is_array( $city_names_arr ) ) ? array_search( $city_full_name, $city_names_arr, true ) : false;
+
+		// Return false, if the vendor city index is unavailable.
+		if ( false === $store_city_index ) {
+			return false;
+		}
+
+		// Return the vendor city ID.
+		return ( ! empty( $city_ids[ $store_city_index ]['id'] ) ) ? $city_ids[ $store_city_index ]['id'] : false;
+	}
+}
